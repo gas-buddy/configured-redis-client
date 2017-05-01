@@ -30,8 +30,8 @@ export default class RedisClient {
   constructor(context, opts) {
     // We have defaults (host/port) and must-haves (lazyConnect)
     this.redisClient = new Redis(Object.assign({}, {
-      host: 'redis',
-      port: 6379,
+      host: process.env.REDIS_HOST || 'redis',
+      port: process.env.REDIS_PORT || 6379,
     }, opts, {
       lazyConnect: true, // We'll manage this ourselves.
     }));
@@ -48,6 +48,7 @@ export default class RedisClient {
       this.redisClient.Ttl = Ttl;
       this.redisClient.getOrSetJSON = (k, t, v) => getOrSetJSON(this.redisClient, k, t, v);
       this.redisClient.makeKey = (...args) => args.join(':');
+      this.redisClient.makeServiceKey = (...args) => `${context.service.name}:${args.join(':')}`;
 
       return this.redisClient;
     } catch (error) {

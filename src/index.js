@@ -11,8 +11,12 @@ const Ttl = {
   oneDay: 60 * 60 * 24,
 };
 
-async function getOrSetJSON(redisClient, key, ttlSeconds, valueFunction) {
-  const cacheValue = await redisClient.get(key);
+async function memoize(redisClient, valueFunction, { key, ttlSeconds = Ttl.oneMinute }) {
+  const keyName = key || valueFunction.name;
+  if (!keyName) {
+    throw new Error('memoize must have a key option or use a named function');
+  }
+  const cacheValue = await redisClient.get(keyName);
   if (cacheValue) {
     return JSON.parse(cacheValue);
   }
@@ -20,7 +24,7 @@ async function getOrSetJSON(redisClient, key, ttlSeconds, valueFunction) {
   const sourceValue = await valueFunction();
 
   if (sourceValue !== undefined) {
-    await redisClient.setex(key, ttlSeconds, JSON.stringify(sourceValue));
+    await redisClient.setex(keyName, ttlSeconds, JSON.stringify(sourceValue));
   }
 
   return sourceValue;
@@ -46,7 +50,7 @@ export default class RedisClient {
       // Add our helpers. At some point we'll front the ioredis API with our own that tracks
       // various things, but for now just muck with the instance
       this.redisClient.Ttl = Ttl;
-      this.redisClient.getOrSetJSON = (k, t, v) => getOrSetJSON(this.redisClient, k, t, v);
+      this.redisClient.memoize = (fn, opts) => memoize(this.redisClient, fn, opts || {});
       this.redisClient.makeKey = (...args) => args.join(':');
       this.redisClient.makeServiceKey = (...args) => `${context.service.name}:${args.join(':')}`;
 

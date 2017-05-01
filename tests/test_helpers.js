@@ -7,6 +7,8 @@ const context = {
   logger: winston,
 };
 
+const v = { a: '123', b: 1234, c: { d: true } };
+
 tap.test('test_helpers', async (tester) => {
   const redis = new RedisClient(context, {});
   const client = await redis.start(context);
@@ -18,19 +20,28 @@ tap.test('test_helpers', async (tester) => {
     t.end();
   });
 
-  tester.test('getOrSetJSON', async (t) => {
-    const v = { a: '123', b: 1234, c: { d: true } };
-    const k = `testkey-${Date.now()}`;
+  tester.test('memoize with named function', async (t) => {
+    function makeItRain() {
+      return v;
+    }
+    const value = await client.memoize(makeItRain);
+    t.deepEqual(v, value, 'Value should match original');
+    const value2 = await client.memoize(makeItRain);
+    t.deepEqual(v, value2, 'Value should match original');
+  });
+
+  tester.test('memoize with key', async (t) => {
+    const key = `testkey-${Date.now()}`;
     let called = false;
-    const value = await client.getOrSetJSON(k, client.Ttl.oneMinute, () => {
+    const value = await client.memoize(() => {
       called = true;
       return v;
-    });
+    }, { key });
     t.deepEqual(v, value, 'Value should match original');
     t.ok(called, 'Should call data function');
-    const cacheValue = await client.getOrSetJSON(k, client.Ttl.oneMinute, () => {
+    const cacheValue = await client.memoize(() => {
       t.fail('Should not call data function after caching');
-    });
+    }, { key });
     t.deepEqual(v, cacheValue, 'Value should match original');
   });
 

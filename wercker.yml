@@ -1,5 +1,8 @@
 box: node:6
 
+services:
+  - redis:alpine
+
 build:
   steps:
     - npm-install
@@ -7,6 +10,12 @@ build:
     - script:
       name: lint
       code: npm run lint
+
+    - script:
+      name: env vars for redis
+      code: |
+        export REDIS_HOST=$REDIS_PORT_6379_TCP_ADDR
+        export REDIS_PORT=$REDIS_PORT_6379_TCP_PORT
 
     - npm-test
 

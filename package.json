@@ -23,10 +23,10 @@
   "license": "UNLICENSED",
   "devDependencies": {
     "babel-cli": "^6.4.5",
-    "babel-preset-gasbuddy": "^1",
+    "babel-preset-gasbuddy": "^2",
     "bluebird": "^3.2.1",
     "eslint": "^3.1.0",
-    "eslint-config-gasbuddy": "^1",
+    "eslint-config-gasbuddy": "^2",
     "tap": "^10.0.0",
     "winston": "^2.3.1"
   },

@@ -28,8 +28,8 @@ req.gb.db.redis.Ttl.oneMinute // => 60
 req.gb.db.redis.Ttl.oneHour // => 3600
 ```
 
-### Key Makers
-To generate a key, use `makeKey()`
+### Redis Keys
+To make a key, use `makeKey()`
 ```javascript
 req.gb.db.redis.makeKey('redis', 'is', 'cool') // => 'redis:is:cool'
 ```

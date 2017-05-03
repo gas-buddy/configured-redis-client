@@ -53,7 +53,7 @@ const mySlowDataFunction = async () => {
 const myVal = redisClient.memoize(
   mySlowDataFunction,
   {
-    key: redisClient.makeKey('redis', 'is', 'cool') // defaults to name of function
+    key: redisClient.makeKey('redis', 'is', 'cool'), // defaults to name of function
     ttlSeconds: redisClient.Ttl.fiveMinutes, // defaults to one minute
   },
 );

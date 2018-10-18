@@ -1,10 +1,9 @@
 import tap from 'tap';
-import winston from 'winston';
 import RedisClient from '../src/index';
 
 const context = {
   service: { name: 'servName' },
-  logger: winston,
+  logger: console,
 };
 
 const v = { a: '123', b: 1234, c: { d: true } };
